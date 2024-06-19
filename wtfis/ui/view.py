@@ -13,6 +13,7 @@ from wtfis.models.shodan import ShodanIpMap
 from wtfis.models.types import IpGeoAsnMapType
 from wtfis.models.urlhaus import UrlHausMap
 from wtfis.models.virustotal import Domain, IpAddress, Resolutions
+from wtfis.wtfis.models.r7insight import Rapid7InsightMap
 from wtfis.ui.base import BaseView
 from wtfis.utils import Timestamp, smart_join
 
@@ -33,10 +34,11 @@ class DomainView(BaseView):
         greynoise: GreynoiseIpMap,
         abuseipdb: AbuseIpDbMap,
         urlhaus: UrlHausMap,
+        rapid7Insight: Rapid7InsightMap,
         max_resolutions: int = 3,
     ) -> None:
         super().__init__(
-            console, entity, geoasn, whois, shodan, greynoise, abuseipdb, urlhaus
+            console, entity, geoasn, whois, shodan, greynoise, abuseipdb, urlhaus, rapid7Insight
         )
 
         self.resolutions = resolutions
@@ -126,6 +128,11 @@ class DomainView(BaseView):
             if abuseipdb:
                 data += [self._gen_abuseipdb_tuple(abuseipdb)]
 
+            # Rapid7 Insight
+            rapid7Insight = self._get_rapid7Insight_enrichment(attributes.ip_address)
+            if rapid7Insight:
+                data += [self._gen_rapid7Insight_tuple(rapid7Insight)]
+
             # Include a disclaimer if last seen is older than 1 year
             # Note: Disabled for now because I originally understood that the
             # resolution date was the last time the domain was resolved, but it may
@@ -201,9 +208,10 @@ class IpAddressView(BaseView):
         greynoise: GreynoiseIpMap,
         abuseipdb: AbuseIpDbMap,
         urlhaus: UrlHausMap,
+        rapid7Insight: Rapid7InsightMap,
     ) -> None:
         super().__init__(
-            console, entity, geoasn, whois, shodan, greynoise, abuseipdb, urlhaus
+            console, entity, geoasn, whois, shodan, greynoise, abuseipdb, urlhaus, rapid7Insight
         )
 
     def ip_panel(self) -> Panel:

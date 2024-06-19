@@ -44,6 +44,8 @@ POSSIBLE_ENV_VARS = [
     "SHODAN_API_KEY",
     "GREYNOISE_API_KEY",
     "ABUSEIPDB_API_KEY",
+    "RAPID7_ACCOUNT_ID",
+    "RAPID7_API_KEY",
     "WTFIS_DEFAULTS",
 ]
 
@@ -88,6 +90,8 @@ def fake_load_dotenv_1(tmp_path):
         "SHODAN_API_KEY": "hunter2",
         "GREYNOISE_API_KEY": "upupdowndown",
         "ABUSEIPDB_API_KEY": "dummy",
+        "RAPID7_ACCOUNT_ID": "123",
+        "RAPID7_API_KEY": "456",
     }
     return fake_load_dotenv(tmp_path, fake_env_vars)
 
@@ -135,6 +139,16 @@ def fake_load_dotenv_ip2whois(tmp_path):
     fake_env_vars = {
         "VT_API_KEY": "foo",
         "IP2WHOIS_API_KEY": "alice",
+    }
+    return fake_load_dotenv(tmp_path, fake_env_vars)
+
+@pytest.fixture()
+def fake_load_dotenv_rapid7(tmp_path):
+    fake_env_vars = {
+        "VT_API_KEY": "foo",
+        "RAPID7_ACCOUNT_ID": "123",
+        "RAPID7_API_KEY": "456",
+        "WTFIS_DEFAULTS": "-r",
     }
     return fake_load_dotenv(tmp_path, fake_env_vars)
 

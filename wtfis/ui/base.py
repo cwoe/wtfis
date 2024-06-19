@@ -14,6 +14,7 @@ from wtfis.models.shodan import ShodanIp, ShodanIpMap
 from wtfis.models.types import IpGeoAsnMapType, IpGeoAsnType
 from wtfis.models.urlhaus import UrlHaus, UrlHausMap
 from wtfis.models.virustotal import LastAnalysisStats, PopularityRanks
+from wtfis.wtfis.models.r7insight import Rapid7Insight, Rapid7InsightMap
 from wtfis.ui.theme import Theme
 from wtfis.utils import Timestamp, is_ip, smart_join
 
@@ -38,6 +39,7 @@ class BaseView(abc.ABC):
         greynoise: GreynoiseIpMap,
         abuseipdb: AbuseIpDbMap,
         urlhaus: UrlHausMap,
+        rapid7Insight: Rapid7InsightMap,
     ) -> None:
         self.console = console
         self.entity = entity
@@ -47,6 +49,7 @@ class BaseView(abc.ABC):
         self.greynoise = greynoise
         self.abuseipdb = abuseipdb
         self.urlhaus = urlhaus
+        self.rapid7Insight = rapid7Insight
         self.theme = Theme()
 
     def _vendors_who_flagged_malicious(self) -> List[str]:
@@ -298,6 +301,55 @@ class BaseView(abc.ABC):
             text.append(f" ({ip.total_reports} reports)", style=self.theme.table_value)
 
         return title, text
+    
+
+    def _gen_rapid7_tuple(self, ip: Rapid7Insight) -> Tuple[Text, Text]:
+
+        #
+        # Title
+        #
+        title = self._gen_linked_field_name(
+            "Rapid7 Insight", hyperlink=f""
+        )
+
+        #
+        # Content
+        #
+        if ip.whitelisted:
+            style = self.theme.info
+            text = Text("Whitelisted", style=style)
+            return title, text
+
+        if ip.severity == "High":
+            style = self.theme.info
+        elif ip.severity == "Medium":
+            style = self.theme.warn
+        else:
+            style = self.theme.error
+
+        text = Text()
+        (
+            text.append(Text(str(ip.severity), style=style)).append(
+                " severity", style=style.replace("bold ", "")
+            )
+        )
+
+        if len(ip.relatedMalware) > 0:
+            text.append(f"\n related malware", style=self.theme.table_value)
+            for malware in ip.relatedMalware:
+                text.append(f" {malware}", style=self.theme.table_value)
+
+        if len(ip.relatedCampaigns) > 0:
+            text.append(f"\n related campaigns", style=self.theme.table_value)
+            for campaign in ip.relatedCampaigns:
+                text.append(f" {campaign}", style=self.theme.table_value)
+
+        if len(ip.reportedFeeds) > 0:
+            text.append(f"\n reported feeds", style=self.theme.table_value)
+            for feed in ip.reportedFeeds:
+                text.append(f" {feed.name}", style=self.theme.table_value)
+
+        return title, text
 
     def _gen_asn_text(
         self,
@@ -329,6 +381,9 @@ class BaseView(abc.ABC):
 
     def _get_urlhaus_enrichment(self, entity: str) -> Optional[UrlHaus]:
         return self.urlhaus.root[entity] if entity in self.urlhaus.root.keys() else None
+    
+    def _get_rapid7insight_enrichment(self, entity: str) -> Optional[Rapid7Insight]:
+        return self.rapid7Insight.root[entity] if entity in self.rapid7Insight.root.keys() else None
 
     def _gen_vt_section(self) -> RenderableType:
         """Virustotal section. Applies to both domain and IP views"""

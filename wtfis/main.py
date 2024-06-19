@@ -16,6 +16,7 @@ from wtfis.clients.passivetotal import PTClient
 from wtfis.clients.shodan import ShodanClient
 from wtfis.clients.urlhaus import UrlHausClient
 from wtfis.clients.virustotal import VTClient
+from wtfis.clients.r7insight import Rapid7InsightClient
 from wtfis.exceptions import WtfisException
 from wtfis.handlers.base import BaseHandler
 from wtfis.handlers.domain import DomainHandler
@@ -78,6 +79,9 @@ def parse_args() -> Namespace:
         action="store_true",
     )
     parser.add_argument(
+        "-r", "--use-rapid7", help="Enable Rapid7 Insight for IPs and Domains", action="store_true"
+    )
+    parser.add_argument(
         "-n", "--no-color", help="Show output without colors", action="store_true"
     )
     parser.add_argument(
@@ -103,6 +107,8 @@ def parse_args() -> Namespace:
             parsed.use_abuseipdb = not parsed.use_abuseipdb
         elif option in ("-u", "--use-urlhaus"):
             parsed.use_urlhaus = not parsed.use_urlhaus
+        elif option in ("-r", "--use-rapid7"):
+            parsed.use_urlhaus = not parsed.use_rapid7
         elif option in ("-n", "--no-color"):
             parsed.no_color = not parsed.no_color
         elif option in ("-1", "--one-column"):
@@ -117,6 +123,10 @@ def parse_args() -> Namespace:
         argparse.ArgumentParser().error("GREYNOISE_API_KEY is not set")
     if parsed.use_abuseipdb and not os.environ.get("ABUSEIPDB_API_KEY"):
         argparse.ArgumentParser().error("ABUSEIPDB_API_KEY is not set")
+    if parsed.use_rapid7 and not os.environ.get("RAPID7_ACCOUNT_ID"):
+        argparse.ArgumentParser().error("RAPID7_ACCOUNT_ID is not set")
+    if parsed.use_rapid7 and not os.environ.get("RAPID7_API_KEY"):
+        argparse.ArgumentParser().error("RAPID7_API_KEY is not set")
     if is_ip(parsed.entity) and parsed.max_resolutions != DEFAULT_MAX_RESOLUTIONS:
         argparse.ArgumentParser().error("--max-resolutions is not applicable to IPs")
 
@@ -165,6 +175,11 @@ def generate_entity_handler(
 
     # URLhaus client (optional)
     urlhaus_client = UrlHausClient() if args.use_urlhaus else None
+
+    # Rapid7 Insights client (optional)
+    abuseipdb_client = (
+        Rapid7InsightClient(os.environ["RaPID7_ACCOUNT_ID"], os.environ["RAPID7_API_KEY"]) if args.use_rapid7 else None
+    )
 
     # Domain / FQDN handler
     if not is_ip(args.entity):
@@ -216,6 +231,7 @@ def generate_view(
             entity.greynoise,
             entity.abuseipdb,
             entity.urlhaus,
+            entity.rapid7Insight,
             max_resolutions=args.max_resolutions,
         )
     elif isinstance(entity, IpAddressHandler) and isinstance(entity.vt_info, IpAddress):
@@ -228,6 +244,7 @@ def generate_view(
             entity.greynoise,
             entity.abuseipdb,
             entity.urlhaus,
+            entity.rapid7Insight,
         )
     else:
         raise WtfisException("Unsupported entity!")
