@@ -14,6 +14,7 @@ from wtfis.clients.shodan import ShodanClient
 from wtfis.clients.types import IpGeoAsnClientType, IpWhoisClientType
 from wtfis.clients.urlhaus import UrlHausClient
 from wtfis.clients.virustotal import VTClient
+from wtfis.clients.r7insight import Rapid7InsightClient
 from wtfis.handlers.base import (
     BaseHandler,
     common_exception_handler,
@@ -35,6 +36,7 @@ class DomainHandler(BaseHandler):
         greynoise_client: Optional[GreynoiseClient],
         abuseipdb_client: Optional[AbuseIpDbClient],
         urlhaus_client: Optional[UrlHausClient],
+        rapid7insight_client: Optional[Rapid7InsightClient],
         max_resolutions: int = 0,
     ):
         super().__init__(
@@ -48,6 +50,7 @@ class DomainHandler(BaseHandler):
             greynoise_client,
             abuseipdb_client,
             urlhaus_client,
+            rapid7insight_client,
         )
 
         # Extended attributes
@@ -115,6 +118,14 @@ class DomainHandler(BaseHandler):
                 self.progress.update(task_g, advance=50)
                 self._fetch_abuseipdb(*self.resolutions.ip_list(self.max_resolutions))
                 self.progress.update(task_g, completed=100)
+
+            if self._rapid7insight:
+                task_r = self.progress.add_task(
+                    f"Fetching IP data from {self._rapid7insight.name}"
+                )
+                self.progress.update(task_r, advance=50)
+                self._fetch_rapid7insight(*self.resolutions.ip_list(self.max_resolutions))
+                self.progress.update(task_r, completed=100)
 
         if self._urlhaus:
             task_u = self.progress.add_task(

@@ -19,6 +19,7 @@ from wtfis.clients.shodan import ShodanClient
 from wtfis.clients.types import IpGeoAsnClientType, IpWhoisClientType
 from wtfis.clients.urlhaus import UrlHausClient
 from wtfis.clients.virustotal import VTClient
+from wtfis.clients.r7insight import Rapid7InsightClient
 from wtfis.models.abuseipdb import AbuseIpDbMap
 from wtfis.models.base import WhoisBase
 from wtfis.models.greynoise import GreynoiseIpMap
@@ -27,6 +28,7 @@ from wtfis.models.shodan import ShodanIpMap
 from wtfis.models.types import IpGeoAsnMapType
 from wtfis.models.urlhaus import UrlHausMap
 from wtfis.models.virustotal import Domain, IpAddress
+from wtfis.models.r7insight import Rapid7InsightMap
 from wtfis.ui.theme import Theme
 from wtfis.utils import error_and_exit, refang
 
@@ -79,6 +81,7 @@ class BaseHandler(abc.ABC):
         greynoise_client: Optional[GreynoiseClient],
         abuseipdb_client: Optional[AbuseIpDbClient],
         urlhaus_client: Optional[UrlHausClient],
+        rapid7insight_client: Optional[Rapid7InsightClient],
     ):
         # Process-specific
         self.entity = refang(entity)
@@ -93,6 +96,7 @@ class BaseHandler(abc.ABC):
         self._greynoise = greynoise_client
         self._abuseipdb = abuseipdb_client
         self._urlhaus = urlhaus_client
+        self._rapid7insight = rapid7insight_client
 
         # Dataset containers
         self.vt_info: Union[Domain, IpAddress]
@@ -102,6 +106,7 @@ class BaseHandler(abc.ABC):
         self.greynoise: GreynoiseIpMap = GreynoiseIpMap.empty()
         self.abuseipdb: AbuseIpDbMap = AbuseIpDbMap.empty()
         self.urlhaus: UrlHausMap = UrlHausMap.empty()
+        self.rapid7insight: Rapid7InsightMap = Rapid7InsightMap.empty()
 
         # Warning messages container
         self.warnings: List[str] = []
@@ -133,6 +138,12 @@ class BaseHandler(abc.ABC):
     def _fetch_abuseipdb(self, *ips: str) -> None:
         if self._abuseipdb:
             self.abuseipdb = self._abuseipdb.enrich_ips(*ips)
+
+    @common_exception_handler
+    @failopen_exception_handler("_rapid7insight")
+    def _fetch_rapid7insight(self, *ips: str) -> None:
+        if self._rapid7insight:
+            self.rapid7insight = self._rapid7insight.enrich_ips(*ips)
 
     @common_exception_handler
     def _fetch_whois(self) -> None:

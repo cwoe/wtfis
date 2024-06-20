@@ -58,12 +58,21 @@ class IpAddressHandler(BaseHandler):
             self.progress.update(task_g, completed=100)
 
         if self._abuseipdb:
+            print(self._abuseipdb)
             task_a = self.progress.add_task(
                 f"Fetching IP data from {self._abuseipdb.name}"
             )
             self.progress.update(task_a, advance=50)
             self._fetch_abuseipdb(self.entity)
             self.progress.update(task_a, completed=100)
+
+        if self._rapid7insight:
+            task_r = self.progress.add_task(
+                f"Fetching IP data from {self._rapid7insight.name}"
+            )
+            self.progress.update(task_r, advance=50)
+            self._fetch_rapid7insight(self.entity)
+            self.progress.update(task_r, completed=100)
 
         task_w = self.progress.add_task(f"Fetching IP whois from {self._whois.name}")
         self.progress.update(task_w, advance=50)

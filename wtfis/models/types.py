@@ -9,7 +9,7 @@ from wtfis.models.greynoise import GreynoiseIpMap
 from wtfis.models.ipwhois import IpWhois, IpWhoisMap
 from wtfis.models.shodan import ShodanIpMap
 from wtfis.models.urlhaus import UrlHausMap
-from wtfis.wtfis.models.r7insight import Rapid7InsightMap
+from wtfis.models.r7insight import Rapid7InsightMap
 
 # IP enrichment map types
 IpEnrichmentType = Union[

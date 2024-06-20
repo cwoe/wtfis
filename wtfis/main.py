@@ -108,7 +108,7 @@ def parse_args() -> Namespace:
         elif option in ("-u", "--use-urlhaus"):
             parsed.use_urlhaus = not parsed.use_urlhaus
         elif option in ("-r", "--use-rapid7"):
-            parsed.use_urlhaus = not parsed.use_rapid7
+            parsed.use_rapid7 = not parsed.use_rapid7
         elif option in ("-n", "--no-color"):
             parsed.no_color = not parsed.no_color
         elif option in ("-1", "--one-column"):
@@ -177,8 +177,8 @@ def generate_entity_handler(
     urlhaus_client = UrlHausClient() if args.use_urlhaus else None
 
     # Rapid7 Insights client (optional)
-    abuseipdb_client = (
-        Rapid7InsightClient(os.environ["RaPID7_ACCOUNT_ID"], os.environ["RAPID7_API_KEY"]) if args.use_rapid7 else None
+    rapid7insight_client = (
+        Rapid7InsightClient(os.environ["RAPID7_ACCOUNT_ID"], os.environ["RAPID7_API_KEY"]) if args.use_rapid7 else None
     )
 
     # Domain / FQDN handler
@@ -195,6 +195,7 @@ def generate_entity_handler(
             abuseipdb_client=abuseipdb_client,
             urlhaus_client=urlhaus_client,
             max_resolutions=args.max_resolutions,
+            rapid7insight_client=rapid7insight_client,
         )
     # IP address handler
     else:
@@ -209,6 +210,7 @@ def generate_entity_handler(
             greynoise_client=greynoise_client,
             abuseipdb_client=abuseipdb_client,
             urlhaus_client=urlhaus_client,
+            rapid7insight_client=rapid7insight_client,
         )
 
     return entity
@@ -231,7 +233,7 @@ def generate_view(
             entity.greynoise,
             entity.abuseipdb,
             entity.urlhaus,
-            entity.rapid7Insight,
+            entity.rapid7insight,
             max_resolutions=args.max_resolutions,
         )
     elif isinstance(entity, IpAddressHandler) and isinstance(entity.vt_info, IpAddress):
@@ -244,7 +246,7 @@ def generate_view(
             entity.greynoise,
             entity.abuseipdb,
             entity.urlhaus,
-            entity.rapid7Insight,
+            entity.rapid7insight,
         )
     else:
         raise WtfisException("Unsupported entity!")

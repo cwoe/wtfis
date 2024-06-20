@@ -1,9 +1,10 @@
 from typing import Optional
 
 from requests.exceptions import HTTPError
+from requests.auth import HTTPBasicAuth
 
 from wtfis.clients.base import BaseIpEnricherClient, BaseRequestsClient, BaseDomainEnricherClient
-from wtfis.wtfis.models.r7insight import Rapid7Insight, Rapid7InsightMap
+from wtfis.models.r7insight import Rapid7Insight, Rapid7InsightMap
 
 
 class Rapid7InsightClient(BaseRequestsClient, BaseDomainEnricherClient, BaseIpEnricherClient):
@@ -17,6 +18,8 @@ class Rapid7InsightClient(BaseRequestsClient, BaseDomainEnricherClient, BaseIpEn
         super().__init__()
         self.user_id = user_id
         self.api_key = api_key
+        self.s.auth = HTTPBasicAuth(self.user_id, self.api_key)
+
 
     @property
     def name(self) -> str:
@@ -25,7 +28,7 @@ class Rapid7InsightClient(BaseRequestsClient, BaseDomainEnricherClient, BaseIpEn
     def _get_host(self, host: str) -> Rapid7Insight:
         try:
             return Rapid7Insight.model_validate(
-                self._get(f"/v3/iocs/ioc-by-value?iocValue={ip}", headers={"key": self.api_key})
+                self._get(f"v3/iocs/ioc-by-value?iocValue={host}")
             )
         except HTTPError as e:
             if e.response.status_code == 404:
@@ -34,15 +37,15 @@ class Rapid7InsightClient(BaseRequestsClient, BaseDomainEnricherClient, BaseIpEn
 
     def _enrich(self, *entities: str) -> Rapid7InsightMap:
         """Method is the same whether input is a domain or IP"""
-        urlhaus_map = {}
+        rapid7insight_map = {}
         for entity in entities:
             data = self._get_host(entity)
-            if data.host:
-                urlhaus_map[data.host] = data
-        return Rapid7InsightMap.model_validate(urlhaus_map)
+            if data.value:
+                rapid7insight_map[data.value] = data
+        return Rapid7InsightMap.model_validate(rapid7insight_map)
 
     def enrich_ips(self, *ips: str) -> Rapid7InsightMap:
         return self._enrich(*ips)
 
-
-
+    def enrich_domains(self, *ips: str) -> Rapid7InsightMap:
+        return self._enrich(*ips)

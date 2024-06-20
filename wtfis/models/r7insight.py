@@ -29,7 +29,7 @@ class Rapid7Insight(BaseModel):
 
 
 class Rapid7InsightMap(RootModel):
-    root: Dict[str, Rapid7InsightIp]
+    root: Dict[str, Rapid7Insight]
 
     @classmethod
     def empty(cls) -> Rapid7InsightMap:

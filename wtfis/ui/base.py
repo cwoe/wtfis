@@ -14,7 +14,7 @@ from wtfis.models.shodan import ShodanIp, ShodanIpMap
 from wtfis.models.types import IpGeoAsnMapType, IpGeoAsnType
 from wtfis.models.urlhaus import UrlHaus, UrlHausMap
 from wtfis.models.virustotal import LastAnalysisStats, PopularityRanks
-from wtfis.wtfis.models.r7insight import Rapid7Insight, Rapid7InsightMap
+from wtfis.models.r7insight import Rapid7Insight, Rapid7InsightMap
 from wtfis.ui.theme import Theme
 from wtfis.utils import Timestamp, is_ip, smart_join
 
@@ -39,7 +39,7 @@ class BaseView(abc.ABC):
         greynoise: GreynoiseIpMap,
         abuseipdb: AbuseIpDbMap,
         urlhaus: UrlHausMap,
-        rapid7Insight: Rapid7InsightMap,
+        rapid7insight: Rapid7InsightMap,
     ) -> None:
         self.console = console
         self.entity = entity
@@ -49,7 +49,7 @@ class BaseView(abc.ABC):
         self.greynoise = greynoise
         self.abuseipdb = abuseipdb
         self.urlhaus = urlhaus
-        self.rapid7Insight = rapid7Insight
+        self.rapid7insight = rapid7insight
         self.theme = Theme()
 
     def _vendors_who_flagged_malicious(self) -> List[str]:
@@ -308,16 +308,13 @@ class BaseView(abc.ABC):
         #
         # Title
         #
-        title = self._gen_linked_field_name(
-            "Rapid7 Insight", hyperlink=f""
-        )
+        title = "Rapid7 Insight"
 
         #
         # Content
         #
         if ip.whitelisted:
-            style = self.theme.info
-            text = Text("Whitelisted", style=style)
+            text = Text("Whitelisted", style=self.theme.info)
             return title, text
 
         if ip.severity == "High":
@@ -335,17 +332,17 @@ class BaseView(abc.ABC):
         )
 
         if len(ip.relatedMalware) > 0:
-            text.append(f"\n related malware", style=self.theme.table_value)
+            text.append(f"\nrelated malware:", style=self.theme.tags)
             for malware in ip.relatedMalware:
                 text.append(f" {malware}", style=self.theme.table_value)
 
         if len(ip.relatedCampaigns) > 0:
-            text.append(f"\n related campaigns", style=self.theme.table_value)
+            text.append(f"\nrelated campaigns:", style=self.theme.tags)
             for campaign in ip.relatedCampaigns:
                 text.append(f" {campaign}", style=self.theme.table_value)
 
         if len(ip.reportedFeeds) > 0:
-            text.append(f"\n reported feeds", style=self.theme.table_value)
+            text.append(f"\nreported feeds:", style=self.theme.tags)
             for feed in ip.reportedFeeds:
                 text.append(f" {feed.name}", style=self.theme.table_value)
 
@@ -383,7 +380,7 @@ class BaseView(abc.ABC):
         return self.urlhaus.root[entity] if entity in self.urlhaus.root.keys() else None
     
     def _get_rapid7insight_enrichment(self, entity: str) -> Optional[Rapid7Insight]:
-        return self.rapid7Insight.root[entity] if entity in self.rapid7Insight.root.keys() else None
+        return self.rapid7insight.root[entity] if entity in self.rapid7insight.root.keys() else None
 
     def _gen_vt_section(self) -> RenderableType:
         """Virustotal section. Applies to both domain and IP views"""
@@ -585,6 +582,11 @@ class BaseView(abc.ABC):
         abuseipdb = self._get_abuseipdb_enrichment(ip=self.entity.data.id_)
         if abuseipdb:
             data.append(self._gen_abuseipdb_tuple(abuseipdb))
+
+        # Rapid7 Insight
+        rapid7 = self._get_rapid7insight_enrichment(entity=self.entity.data.id_)
+        if rapid7:
+            data.append(self._gen_rapid7_tuple(rapid7))
 
         if data:
             return self._gen_section(
