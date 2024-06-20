@@ -1,13 +1,16 @@
-from typing import Optional
-
-from requests.exceptions import HTTPError
 from requests.auth import HTTPBasicAuth
 
-from wtfis.clients.base import BaseIpEnricherClient, BaseRequestsClient, BaseDomainEnricherClient
+from wtfis.clients.base import (
+    BaseDomainEnricherClient,
+    BaseIpEnricherClient,
+    BaseRequestsClient,
+)
 from wtfis.models.r7insight import Rapid7Insight, Rapid7InsightMap
 
 
-class Rapid7InsightClient(BaseRequestsClient, BaseDomainEnricherClient, BaseIpEnricherClient):
+class Rapid7InsightClient(
+    BaseRequestsClient, BaseDomainEnricherClient, BaseIpEnricherClient
+):
     """
     Rapid7 Insight client
     """
@@ -20,20 +23,14 @@ class Rapid7InsightClient(BaseRequestsClient, BaseDomainEnricherClient, BaseIpEn
         self.api_key = api_key
         self.s.auth = HTTPBasicAuth(self.user_id, self.api_key)
 
-
     @property
     def name(self) -> str:
         return "Rapid7 Insight"
 
     def _get_host(self, host: str) -> Rapid7Insight:
-        try:
-            return Rapid7Insight.model_validate(
-                self._get(f"v3/iocs/ioc-by-value?iocValue={host}")
-            )
-        except HTTPError as e:
-            if e.response.status_code == 404:
-                return None
-            raise
+        return Rapid7Insight.model_validate(
+            self._get(f"v3/iocs/ioc-by-value?iocValue={host}")
+        )
 
     def _enrich(self, *entities: str) -> Rapid7InsightMap:
         """Method is the same whether input is a domain or IP"""

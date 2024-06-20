@@ -10,6 +10,7 @@ class Rapid7InsightFeed(BaseModel):
     name: str
     confidenceLevel: int
 
+
 class Rapid7Insight(BaseModel):
     value: str
     type: str

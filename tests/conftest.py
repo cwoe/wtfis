@@ -8,9 +8,9 @@ from rich.text import Span, Text
 from wtfis.models.abuseipdb import AbuseIpDb
 from wtfis.models.greynoise import GreynoiseIp
 from wtfis.models.ipwhois import IpWhois
+from wtfis.models.r7insight import Rapid7Insight
 from wtfis.models.shodan import ShodanIp
 from wtfis.models.urlhaus import UrlHaus
-from wtfis.models.r7insight import Rapid7Insight
 
 
 class TestTheme:
@@ -78,6 +78,7 @@ def urlhaus_get_host(entity, pool) -> UrlHaus:
     """Mock replacement for UrlHausClient()._get_host()"""
     return UrlHaus.model_validate(pool[entity])
 
+
 def rapid7_get_host(entity, pool) -> UrlHaus:
     """Mock replacement for UrlHausClient()._get_host()"""
     return Rapid7Insight.model_validate(pool[entity])
@@ -129,6 +130,7 @@ def mock_shodan_get_ip():
 @pytest.fixture(scope="module")
 def mock_urlhaus_get():
     return urlhaus_get_host
+
 
 @pytest.fixture(scope="module")
 def mock_rapid7_get():

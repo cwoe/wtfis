@@ -10,11 +10,11 @@ from wtfis.exceptions import WtfisException
 from wtfis.models.abuseipdb import AbuseIpDb, AbuseIpDbMap
 from wtfis.models.base import WhoisBase
 from wtfis.models.greynoise import GreynoiseIp, GreynoiseIpMap
+from wtfis.models.r7insight import Rapid7Insight, Rapid7InsightMap
 from wtfis.models.shodan import ShodanIp, ShodanIpMap
 from wtfis.models.types import IpGeoAsnMapType, IpGeoAsnType
 from wtfis.models.urlhaus import UrlHaus, UrlHausMap
 from wtfis.models.virustotal import LastAnalysisStats, PopularityRanks
-from wtfis.models.r7insight import Rapid7Insight, Rapid7InsightMap
 from wtfis.ui.theme import Theme
 from wtfis.utils import Timestamp, is_ip, smart_join
 
@@ -301,14 +301,13 @@ class BaseView(abc.ABC):
             text.append(f" ({ip.total_reports} reports)", style=self.theme.table_value)
 
         return title, text
-    
 
     def _gen_rapid7_tuple(self, ip: Rapid7Insight) -> Tuple[Text, Text]:
 
         #
         # Title
         #
-        title = "Rapid7 Insight"
+        title = Text("Rapid7 Insight:")
 
         #
         # Content
@@ -318,9 +317,11 @@ class BaseView(abc.ABC):
             return title, text
 
         if ip.severity == "High":
-            style = self.theme.info
+            style = self.theme.error
         elif ip.severity == "Medium":
             style = self.theme.warn
+        elif ip.severity == "Low":
+            style = self.theme.info
         else:
             style = self.theme.error
 
@@ -332,19 +333,22 @@ class BaseView(abc.ABC):
         )
 
         if len(ip.relatedMalware) > 0:
-            text.append(f"\nrelated malware:", style=self.theme.tags)
+            text.append("\nrelated malware:", style=self.theme.tags)
             for malware in ip.relatedMalware:
-                text.append(f" {malware}", style=self.theme.table_value)
+                text.append(f" {malware},", style=self.theme.table_value)
+            text = text[:-1]
 
         if len(ip.relatedCampaigns) > 0:
-            text.append(f"\nrelated campaigns:", style=self.theme.tags)
+            text.append("\nrelated campaigns:", style=self.theme.tags)
             for campaign in ip.relatedCampaigns:
-                text.append(f" {campaign}", style=self.theme.table_value)
+                text.append(f" {campaign},", style=self.theme.table_value)
+            text = text[:-1]
 
         if len(ip.reportedFeeds) > 0:
-            text.append(f"\nreported feeds:", style=self.theme.tags)
+            text.append("\nreported feeds:", style=self.theme.tags)
             for feed in ip.reportedFeeds:
-                text.append(f" {feed.name}", style=self.theme.table_value)
+                text.append(f" {feed.name},", style=self.theme.table_value)
+            text = text[:-1]
 
         return title, text
 
@@ -378,9 +382,13 @@ class BaseView(abc.ABC):
 
     def _get_urlhaus_enrichment(self, entity: str) -> Optional[UrlHaus]:
         return self.urlhaus.root[entity] if entity in self.urlhaus.root.keys() else None
-    
+
     def _get_rapid7insight_enrichment(self, entity: str) -> Optional[Rapid7Insight]:
-        return self.rapid7insight.root[entity] if entity in self.rapid7insight.root.keys() else None
+        return (
+            self.rapid7insight.root[entity]
+            if entity in self.rapid7insight.root.keys()
+            else None
+        )
 
     def _gen_vt_section(self) -> RenderableType:
         """Virustotal section. Applies to both domain and IP views"""

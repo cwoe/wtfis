@@ -13,10 +13,10 @@ from wtfis.clients.greynoise import GreynoiseClient
 from wtfis.clients.ip2whois import Ip2WhoisClient
 from wtfis.clients.ipwhois import IpWhoisClient
 from wtfis.clients.passivetotal import PTClient
+from wtfis.clients.r7insight import Rapid7InsightClient
 from wtfis.clients.shodan import ShodanClient
 from wtfis.clients.urlhaus import UrlHausClient
 from wtfis.clients.virustotal import VTClient
-from wtfis.clients.r7insight import Rapid7InsightClient
 from wtfis.exceptions import WtfisException
 from wtfis.handlers.base import BaseHandler
 from wtfis.handlers.domain import DomainHandler
@@ -79,7 +79,10 @@ def parse_args() -> Namespace:
         action="store_true",
     )
     parser.add_argument(
-        "-r", "--use-rapid7", help="Enable Rapid7 Insight for IPs and Domains", action="store_true"
+        "-r",
+        "--use-rapid7",
+        help="Enable Rapid7 Insight for IPs and Domains",
+        action="store_true",
     )
     parser.add_argument(
         "-n", "--no-color", help="Show output without colors", action="store_true"
@@ -178,7 +181,11 @@ def generate_entity_handler(
 
     # Rapid7 Insights client (optional)
     rapid7insight_client = (
-        Rapid7InsightClient(os.environ["RAPID7_ACCOUNT_ID"], os.environ["RAPID7_API_KEY"]) if args.use_rapid7 else None
+        Rapid7InsightClient(
+            os.environ["RAPID7_ACCOUNT_ID"], os.environ["RAPID7_API_KEY"]
+        )
+        if args.use_rapid7
+        else None
     )
 
     # Domain / FQDN handler

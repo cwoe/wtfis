@@ -77,6 +77,7 @@ def view01(
         greynoise=greynoise_enrich,
         abuseipdb=abuseipdb_enrich,
         urlhaus=urlhaus_enrich,
+        rapid7insight=MagicMock(),
     )
 
 
@@ -114,6 +115,7 @@ def view02(test_data, mock_ipwhois_get, mock_shodan_get_ip, mock_greynoise_get):
         greynoise=greynoise_enrich,
         abuseipdb=MagicMock(),
         urlhaus=UrlHausMap.model_validate({}),
+        rapid7insight=MagicMock(),
     )
 
 
@@ -129,6 +131,7 @@ def view03(test_data):
         greynoise=MagicMock(),
         abuseipdb=MagicMock(),
         urlhaus=MagicMock(),
+        rapid7insight=MagicMock(),
     )
 
 
@@ -149,6 +152,7 @@ def view04(test_data):
         greynoise=GreynoiseIpMap.model_validate({}),
         abuseipdb=MagicMock(),
         urlhaus=UrlHausMap.model_validate({}),
+        rapid7insight=MagicMock(),
     )
 
 
@@ -172,6 +176,7 @@ def view05(test_data, mock_greynoise_get):
         greynoise=greynoise_enrich,
         abuseipdb=MagicMock(),
         urlhaus=UrlHausMap.model_validate({}),
+        rapid7insight=MagicMock(),
     )
 
 
@@ -196,6 +201,7 @@ def view06(test_data, mock_greynoise_get):
         greynoise=greynoise_enrich,
         abuseipdb=MagicMock(),
         urlhaus=MagicMock(),
+        rapid7insight=MagicMock(),
     )
 
 
@@ -219,6 +225,7 @@ def view07(test_data, mock_abuseipdb_get):
         greynoise=MagicMock(),
         abuseipdb=abuseipdb_enrich,
         urlhaus=MagicMock(),
+        rapid7insight=MagicMock(),
     )
 
 
@@ -242,6 +249,7 @@ def view08(test_data, mock_abuseipdb_get):
         greynoise=MagicMock(),
         abuseipdb=abuseipdb_enrich,
         urlhaus=MagicMock(),
+        rapid7insight=MagicMock(),
     )
 
 

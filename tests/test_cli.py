@@ -142,6 +142,7 @@ def fake_load_dotenv_ip2whois(tmp_path):
     }
     return fake_load_dotenv(tmp_path, fake_env_vars)
 
+
 @pytest.fixture()
 def fake_load_dotenv_rapid7(tmp_path):
     fake_env_vars = {
@@ -504,6 +505,7 @@ class TestGenEntityHandler:
         assert entity._greynoise is None
         assert entity._urlhaus is None
         assert entity._abuseipdb is None
+        assert entity._rapid7insight is None
         unset_env_vars()
 
     @patch("sys.argv", ["main", "www.example[.]com", "-s", "-g", "-u", "-m", "5"])
@@ -597,6 +599,7 @@ class TestGenView:
             greynoise_client=MagicMock(),
             abuseipdb_client=MagicMock(),
             urlhaus_client=MagicMock(),
+            rapid7insight_client=MagicMock(),
         )
         entity.vt_info = Domain.model_validate(
             json.loads(test_data("vt_domain_gist.json"))
@@ -620,6 +623,7 @@ class TestGenView:
             greynoise_client=MagicMock(),
             abuseipdb_client=MagicMock(),
             urlhaus_client=MagicMock(),
+            rapid7insight_client=MagicMock(),
         )
         entity.vt_info = IpAddress.model_validate(
             json.loads(test_data("vt_ip_1.1.1.1.json"))

@@ -9,11 +9,11 @@ from rich.text import Text
 from wtfis.models.abuseipdb import AbuseIpDbMap
 from wtfis.models.base import WhoisBase
 from wtfis.models.greynoise import GreynoiseIpMap
+from wtfis.models.r7insight import Rapid7InsightMap
 from wtfis.models.shodan import ShodanIpMap
 from wtfis.models.types import IpGeoAsnMapType
 from wtfis.models.urlhaus import UrlHausMap
 from wtfis.models.virustotal import Domain, IpAddress, Resolutions
-from wtfis.models.r7insight import Rapid7InsightMap
 from wtfis.ui.base import BaseView
 from wtfis.utils import Timestamp, smart_join
 
@@ -38,7 +38,15 @@ class DomainView(BaseView):
         max_resolutions: int = 3,
     ) -> None:
         super().__init__(
-            console, entity, geoasn, whois, shodan, greynoise, abuseipdb, urlhaus, rapid7Insight
+            console,
+            entity,
+            geoasn,
+            whois,
+            shodan,
+            greynoise,
+            abuseipdb,
+            urlhaus,
+            rapid7Insight,
         )
 
         self.resolutions = resolutions
@@ -211,7 +219,15 @@ class IpAddressView(BaseView):
         rapid7insight: Rapid7InsightMap,
     ) -> None:
         super().__init__(
-            console, entity, geoasn, whois, shodan, greynoise, abuseipdb, urlhaus, rapid7insight
+            console,
+            entity,
+            geoasn,
+            whois,
+            shodan,
+            greynoise,
+            abuseipdb,
+            urlhaus,
+            rapid7insight,
         )
 
     def ip_panel(self) -> Panel:

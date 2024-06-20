@@ -10,11 +10,11 @@ from rich.progress import Progress
 
 from wtfis.clients.abuseipdb import AbuseIpDbClient
 from wtfis.clients.greynoise import GreynoiseClient
+from wtfis.clients.r7insight import Rapid7InsightClient
 from wtfis.clients.shodan import ShodanClient
 from wtfis.clients.types import IpGeoAsnClientType, IpWhoisClientType
 from wtfis.clients.urlhaus import UrlHausClient
 from wtfis.clients.virustotal import VTClient
-from wtfis.clients.r7insight import Rapid7InsightClient
 from wtfis.handlers.base import (
     BaseHandler,
     common_exception_handler,
@@ -124,7 +124,9 @@ class DomainHandler(BaseHandler):
                     f"Fetching IP data from {self._rapid7insight.name}"
                 )
                 self.progress.update(task_r, advance=50)
-                self._fetch_rapid7insight(*self.resolutions.ip_list(self.max_resolutions))
+                self._fetch_rapid7insight(
+                    *self.resolutions.ip_list(self.max_resolutions)
+                )
                 self.progress.update(task_r, completed=100)
 
         if self._urlhaus:

@@ -15,20 +15,20 @@ from shodan.exception import APIError
 
 from wtfis.clients.abuseipdb import AbuseIpDbClient
 from wtfis.clients.greynoise import GreynoiseClient
+from wtfis.clients.r7insight import Rapid7InsightClient
 from wtfis.clients.shodan import ShodanClient
 from wtfis.clients.types import IpGeoAsnClientType, IpWhoisClientType
 from wtfis.clients.urlhaus import UrlHausClient
 from wtfis.clients.virustotal import VTClient
-from wtfis.clients.r7insight import Rapid7InsightClient
 from wtfis.models.abuseipdb import AbuseIpDbMap
 from wtfis.models.base import WhoisBase
 from wtfis.models.greynoise import GreynoiseIpMap
 from wtfis.models.ipwhois import IpWhoisMap
+from wtfis.models.r7insight import Rapid7InsightMap
 from wtfis.models.shodan import ShodanIpMap
 from wtfis.models.types import IpGeoAsnMapType
 from wtfis.models.urlhaus import UrlHausMap
 from wtfis.models.virustotal import Domain, IpAddress
-from wtfis.models.r7insight import Rapid7InsightMap
 from wtfis.ui.theme import Theme
 from wtfis.utils import error_and_exit, refang
 

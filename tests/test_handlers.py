@@ -10,6 +10,7 @@ from wtfis.clients.base import requests
 from wtfis.clients.greynoise import GreynoiseClient
 from wtfis.clients.ipwhois import IpWhoisClient
 from wtfis.clients.passivetotal import PTClient
+from wtfis.clients.r7insight import Rapid7InsightClient
 from wtfis.clients.shodan import ShodanClient
 from wtfis.clients.urlhaus import UrlHausClient
 from wtfis.clients.virustotal import VTClient
@@ -32,6 +33,7 @@ def generate_domain_handler(max_resolutions=3):
         greynoise_client=GreynoiseClient("dummykey"),
         abuseipdb_client=AbuseIpDbClient("dummykey"),
         urlhaus_client=UrlHausClient(),
+        rapid7insight_client=Rapid7InsightClient("dummyuser", "dummykey"),
         max_resolutions=max_resolutions,
     )
 
@@ -48,6 +50,7 @@ def generate_ip_handler():
         greynoise_client=GreynoiseClient("dummykey"),
         abuseipdb_client=AbuseIpDbClient("dummykey"),
         urlhaus_client=UrlHausClient(),
+        rapid7insight_client=Rapid7InsightClient("dummyuser", "dummykey"),
     )
 
 
